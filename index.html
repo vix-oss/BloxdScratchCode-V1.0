@@ -335,18 +335,18 @@
     <div class="header">
         <h1>BloxdCodeHelp <span class="header-version">V1.0.0</span></h1>
         <div class="control-group">
-            <button class="header-btn" onclick="showProjectModal()">➕ 新增專案</button>
+            <button class="header-btn" onclick="showProjectModal()">新增專案</button>
             <select id="projectSelect" onchange="loadProject()"
                 style="padding: 8px 12px; background: #000; color: #00ff00; border: 2px solid #00ff00; border-radius: 3px; cursor: pointer;">
                 <option value="">-- 選擇專案 --</option>
             </select>
             <div class="header-separator"></div>
-            <button class="header-btn" onclick="showExamples()">💡 Examples</button>
-            <button class="header-btn" onclick="showHelp()">❓ Help</button>
+            <button class="header-btn" onclick="showExamples()">Examples</button>
+            <button class="header-btn" onclick="showHelp()">Help</button>
             <div class="header-separator"></div>
-            <button class="header-btn" onclick="saveProject()">💾 SAVE</button>
-            <button class="header-btn" onclick="loadProjectFile()">📂 LOAD</button>
-            <button class="header-btn" onclick="exportProject()">📤 EXPORT</button>
+            <button class="header-btn" onclick="saveProject()">SAVE</button>
+            <button class="header-btn" onclick="loadProjectFile()">LOAD</button>
+            <button class="header-btn" onclick="exportProject()">EXPORT</button>
             <div class="header-separator"></div>
             <button class="header-btn" onclick="runCode()"
                 style="background: #00ff00; color: #000; text-shadow: none;">▶ START</button>
@@ -358,13 +358,13 @@
 
         <div class="output-panel">
             <div class="output-header">
-                📄 Generated Code
+                Generated Code
             </div>
             <pre id="output"></pre>
             <div class="output-actions">
-                <button onclick="downloadCode()">📥 Download</button>
-                <button onclick="copyCode()">📋 Copy</button>
-                <button onclick="resetWorkspace()">🔄 Clear</button>
+                <button onclick="downloadCode()">Download</button>
+                <button onclick="copyCode()">Copy</button>
+                <button onclick="resetWorkspace()">Clear</button>
             </div>
         </div>
     </div>
@@ -445,7 +445,7 @@
     <!-- 新增專案模態框 -->
     <div id="projectModal" class="modal">
         <div class="modal-content" style="max-width: 450px;">
-            <div class="modal-header">➕ 新增專案</div>
+            <div class="modal-header">新增專案</div>
             <div class="modal-body">
                 <div style="margin-bottom: 15px;">
                     <label style="display: block; margin-bottom: 5px; color: #00ff00;">專案名稱 *</label>
@@ -456,8 +456,8 @@
                     <label style="display: block; margin-bottom: 5px; color: #00ff00;">專案類型 *</label>
                     <select id="projectType"
                         style="width: 100%; padding: 8px; background: #222; border: 1px solid #00ff00; color: #00ff00;">
-                        <option value="world">🌍 World Code (世界代碼 - 支援事件)</option>
-                        <option value="block">🧩 Code Block (代碼塊 - 不支援事件)</option>
+                        <option value="world">World Code (世界代碼 - 支援事件)</option>
+                        <option value="block">Code Block (代碼塊 - 不支援事件)</option>
                     </select>
                 </div>
                 <div style="margin-bottom: 15px;">
@@ -483,7 +483,7 @@
     <!-- 範例模態框 -->
     <div id="examplesModal" class="modal">
         <div class="modal-content">
-            <div class="modal-header">📚 Code Examples</div>
+            <div class="modal-header">Code Examples</div>
             <div class="modal-body" style="color: #00ff00; font-size: 12px; max-height: 300px; overflow-y: auto;">
                 <p><strong>Welcome Message</strong></p>
                 <p>1. Drag "Player Join" block<br />2. Add "Broadcast" inside<br />3. Type your message</p>
@@ -500,7 +500,7 @@
     <!-- 幫助模態框 -->
     <div id="helpModal" class="modal">
         <div class="modal-content">
-            <div class="modal-header">❓ Help & Documentation</div>
+            <div class="modal-header">Help & Documentation</div>
             <div class="modal-body" style="color: #00ff00; font-size: 12px; max-height: 300px; overflow-y: auto;">
                 <p><strong>Getting Started</strong></p>
                 <p>• Drag blocks from the left panel<br />• Connect them to create logic<br />• Click START to run your
@@ -527,7 +527,7 @@
             if (!Blockly.JavaScript.forBlock) {
                 Blockly.JavaScript.forBlock = {};
             }
-            console.log('✅ Generator registry initialized');
+            console.log('Generator registry initialized');
         }
     </script>
     <script>
@@ -542,7 +542,7 @@
             }
 
             // Additional check: verify generators are loaded
-            console.log('🔍 Blockly loaded, checking generators...');
+            console.log('Blockly loaded, checking generators...');
             console.log('Blockly.JavaScript type:', typeof Blockly.JavaScript);
             console.log('on_player_join in Blockly.JavaScript:', !!Blockly.JavaScript['on_player_join']);
             console.log('forBlock exists:', !!Blockly.JavaScript.forBlock);
@@ -559,11 +559,11 @@
                 const toolboxElement = document.getElementById('toolbox');
 
                 if (!toolboxElement) {
-                    console.error('❌ Toolbox element not found');
+                    console.error('Toolbox element not found');
                     return;
                 }
 
-                console.log('📦 Toolbox found, categories:', toolboxElement.querySelectorAll('category').length);
+                console.log('Toolbox found, categories:', toolboxElement.querySelectorAll('category').length);
 
                 // 轉換 XML 為 Blockly 工具箱結構
                 const toolboxDefinition = Blockly.utils.xml.textToDom(toolboxElement.outerHTML);
@@ -592,12 +592,12 @@
                 });
 
                 workspace.addChangeListener(generateCode);
-                console.log('✅ Blockly initialized successfully');
+                console.log('Blockly initialized successfully');
 
                 // 添加小延遲以確保代碼生成器已準備好
                 setTimeout(generateCode, 100);
             } catch (e) {
-                console.error('❌ Failed to initialize Blockly:', e);
+                console.error('Failed to initialize Blockly:', e);
                 console.error('Stack:', e.stack);
                 setTimeout(initializeBlockly, 500);
             }
@@ -618,7 +618,7 @@
                 // Debug: Check if generators are available
                 if (console && console.log) {
                     if (!Blockly.JavaScript['on_player_join'] && (!Blockly.JavaScript.forBlock || !Blockly.JavaScript.forBlock['on_player_join'])) {
-                        console.warn('⚠️ on_player_join generator not found when generating code');
+                        console.warn('on_player_join generator not found when generating code');
                     }
                 }
 
@@ -724,7 +724,7 @@
             const description = document.getElementById('projectDesc').value.trim();
 
             if (!name) {
-                alert('❌ 請輸入專案名稱');
+                alert('請輸入專案名稱');
                 return;
             }
 
@@ -740,7 +740,7 @@
             // 只有世界代碼才能訪問事件
             updateToolbox(type);
 
-            alert(`✅ 專案 "${name}" 已建立！`);
+            alert(`專案 "${name}" 已建立！`);
         }
 
         function updateProjectList() {
@@ -750,7 +750,7 @@
             projectManager.getAllProjects().forEach(project => {
                 const option = document.createElement('option');
                 option.value = project.id;
-                option.textContent = `${project.name} (${project.type === 'world' ? '🌍 World' : '🧩 Block'})`;
+                option.textContent = `${project.name} (${project.type === 'world' ? 'World' : ' Code Block'})`;
                 select.appendChild(option);
             });
         }
@@ -794,7 +794,7 @@
 
         function saveCurrentProject() {
             if (!projectManager.currentProject) {
-                alert('❌ 請先建立或選擇一個專案');
+                alert('請先建立或選擇一個專案');
                 return;
             }
 
@@ -806,12 +806,12 @@
                 workspace: workspace_data
             });
 
-            alert(`✅ 專案 "${projectManager.currentProject.name}" 已保存！`);
+            alert(`專案 "${projectManager.currentProject.name}" 已保存！`);
         }
 
         function exportProject() {
             if (!projectManager.currentProject) {
-                alert('❌ 請先選擇或建立一個專案');
+                alert('請先選擇或建立一個專案');
                 return;
             }
 
@@ -956,5 +956,6 @@ tick = (ms) => {
     </script>
 
 </body>
+
 
 </html>
