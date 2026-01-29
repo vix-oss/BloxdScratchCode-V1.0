@@ -1,0 +1,960 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>BloxdCodeHelp</title>
+    <script src="https://unpkg.com/blockly/blockly.min.js"></script>
+    <script src="https://unpkg.com/blockly/blocks.min.js"></script>
+    <script src="https://unpkg.com/blockly/javascript.min.js"></script>
+
+    <!-- 不要覆蓋 Blockly.JavaScript，因為它已由 CDN 加載 -->
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            background: #1a1a1a;
+            color: #fff;
+        }
+
+        /* 頂部標題欄 - Neon 風格 */
+        .header {
+            background: #000;
+            border-bottom: 3px solid #00ff00;
+            padding: 12px 20px;
+            display: flex;
+            gap: 20px;
+            align-items: center;
+            flex-wrap: wrap;
+            box-shadow: 0 0 20px rgba(0, 255, 0, 0.3);
+        }
+
+        .header h1 {
+            color: #00ff00;
+            font-size: 22px;
+            font-weight: bold;
+            text-shadow: 0 0 10px #00ff00;
+            margin-right: auto;
+        }
+
+        .header-version {
+            color: #00ff00;
+            font-size: 12px;
+            text-shadow: 0 0 5px #00ff00;
+        }
+
+        .control-group {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .header-btn {
+            padding: 8px 15px;
+            border: 2px solid #00ff00;
+            background: transparent;
+            color: #00ff00;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-shadow: 0 0 5px #00ff00;
+            font-size: 12px;
+        }
+
+        .header-btn:hover {
+            background: #00ff00;
+            color: #000;
+            box-shadow: 0 0 20px #00ff00;
+            text-shadow: none;
+        }
+
+        .header-separator {
+            width: 2px;
+            height: 20px;
+            background: #00ff00;
+            opacity: 0.5;
+        }
+
+        /* 主容器 */
+        .main-container {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        /* Blockly 編輯區 */
+        #blocklyDiv {
+            flex: 1;
+            background: #2a2a2a;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Blockly 工具箱樣式 */
+        .blocklyFlyout {
+            background-color: #1a1a1a !important;
+        }
+
+        .blocklyFlyoutBackground {
+            fill: #1a1a1a !important;
+        }
+
+        .blocklyFlyoutLabelBackground {
+            fill: #000 !important;
+        }
+
+        .blocklyFlyoutLabel {
+            fill: #00ff00 !important;
+        }
+
+        .blocklyText,
+        .blocklyEditableText {
+            fill: #000 !important;
+        }
+
+        .blocklyHidden {
+            display: none !important;
+        }
+
+        /* 右側代碼面板 */
+        .output-panel {
+            width: 35%;
+            display: flex;
+            flex-direction: column;
+            background: #1a1a1a;
+            border-left: 2px solid #00ff00;
+            overflow: hidden;
+        }
+
+        .output-header {
+            background: #000;
+            color: #00ff00;
+            padding: 12px 15px;
+            font-weight: bold;
+            border-bottom: 2px solid #00ff00;
+            text-shadow: 0 0 5px #00ff00;
+        }
+
+        #output {
+            flex: 1;
+            padding: 15px;
+            background: #0a0a0a;
+            overflow-y: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 11px;
+            line-height: 1.6;
+            color: #00ff00;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            text-shadow: 0 0 3px #00ff00;
+        }
+
+        #output::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        #output::-webkit-scrollbar-track {
+            background: #1a1a1a;
+        }
+
+        #output::-webkit-scrollbar-thumb {
+            background: #00ff00;
+            border-radius: 4px;
+        }
+
+        #output::-webkit-scrollbar-thumb:hover {
+            background: #00cc00;
+        }
+
+        .output-actions {
+            display: flex;
+            gap: 5px;
+            padding: 10px;
+            background: #000;
+            border-top: 2px solid #00ff00;
+        }
+
+        .output-actions button {
+            flex: 1;
+            padding: 8px 10px;
+            font-size: 11px;
+            background: transparent;
+            border: 1px solid #00ff00;
+            color: #00ff00;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: bold;
+        }
+
+        .output-actions button:hover {
+            background: #00ff00;
+            color: #000;
+            box-shadow: 0 0 10px #00ff00;
+        }
+
+        /* 模態框樣式 */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.9);
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal.show {
+            display: flex;
+        }
+
+        .modal-content {
+            background: #1a1a1a;
+            padding: 30px;
+            border: 2px solid #00ff00;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 0 30px rgba(0, 255, 0, 0.5);
+        }
+
+        .modal-header {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            color: #00ff00;
+            text-shadow: 0 0 5px #00ff00;
+            border-bottom: 1px solid #00ff00;
+            padding-bottom: 10px;
+        }
+
+        .modal-body {
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #00ff00;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #00ff00;
+            background: #0a0a0a;
+            color: #00ff00;
+            font-size: 13px;
+            font-family: inherit;
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .modal-footer {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+        }
+
+        .btn-primary,
+        .btn-secondary {
+            padding: 10px 20px;
+            border: 2px solid #00ff00;
+            background: transparent;
+            color: #00ff00;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            font-size: 12px;
+        }
+
+        .btn-primary:hover {
+            background: #00ff00;
+            color: #000;
+            box-shadow: 0 0 15px #00ff00;
+        }
+
+        .btn-secondary:hover {
+            background: #00aa00;
+            box-shadow: 0 0 10px #00aa00;
+        }
+
+        /* 響應式設計 */
+        @media (max-width: 1200px) {
+            .main-container {
+                flex-direction: column;
+            }
+
+            .output-panel {
+                width: 100%;
+                height: 250px;
+                border-left: none;
+                border-top: 2px solid #00ff00;
+            }
+
+            .header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .header h1 {
+                margin-right: 0;
+                width: 100%;
+            }
+
+            .control-group {
+                width: 100%;
+                flex-wrap: wrap;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="header">
+        <h1>BloxdCodeHelp <span class="header-version">V1.0.0</span></h1>
+        <div class="control-group">
+            <button class="header-btn" onclick="showProjectModal()">➕ 新增專案</button>
+            <select id="projectSelect" onchange="loadProject()"
+                style="padding: 8px 12px; background: #000; color: #00ff00; border: 2px solid #00ff00; border-radius: 3px; cursor: pointer;">
+                <option value="">-- 選擇專案 --</option>
+            </select>
+            <div class="header-separator"></div>
+            <button class="header-btn" onclick="showExamples()">💡 Examples</button>
+            <button class="header-btn" onclick="showHelp()">❓ Help</button>
+            <div class="header-separator"></div>
+            <button class="header-btn" onclick="saveProject()">💾 SAVE</button>
+            <button class="header-btn" onclick="loadProjectFile()">📂 LOAD</button>
+            <button class="header-btn" onclick="exportProject()">📤 EXPORT</button>
+            <div class="header-separator"></div>
+            <button class="header-btn" onclick="runCode()"
+                style="background: #00ff00; color: #000; text-shadow: none;">▶ START</button>
+        </div>
+    </div>
+
+    <div class="main-container">
+        <div id="blocklyDiv"></div>
+
+        <div class="output-panel">
+            <div class="output-header">
+                📄 Generated Code
+            </div>
+            <pre id="output"></pre>
+            <div class="output-actions">
+                <button onclick="downloadCode()">📥 Download</button>
+                <button onclick="copyCode()">📋 Copy</button>
+                <button onclick="resetWorkspace()">🔄 Clear</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Blockly 工具箱 XML -->
+    <xml id="toolbox" style="display: none">
+        <category name="Events" colour="#ff6b6b">
+            <block type="tick"></block>
+            <block type="on_player_join"></block>
+            <block type="on_player_leave"></block>
+            <block type="on_player_chat"></block>
+            <block type="on_player_jump"></block>
+            <block type="on_respawn_request"></block>
+            <block type="player_command"></block>
+        </category>
+
+        <category name="Entity" colour="#4ecdc4">
+            <block type="get_position"></block>
+            <block type="set_position"></block>
+            <block type="get_velocity"></block>
+            <block type="get_health"></block>
+            <block type="set_health"></block>
+            <block type="apply_health_change"></block>
+            <block type="get_shield_amount"></block>
+            <block type="set_shield_amount"></block>
+            <block type="get_entity_name"></block>
+            <block type="apply_impulse"></block>
+            <block type="send_message"></block>
+            <block type="broadcast_message"></block>
+        </category>
+
+        <category name="World" colour="#74b9ff">
+            <block type="get_block_at"></block>
+            <block type="set_block_at"></block>
+            <block type="play_sound"></block>
+        </category>
+
+        <category name="Inventory" colour="#ffd700">
+            <block type="give_item"></block>
+            <block type="clear_inventory"></block>
+        </category>
+
+        <category name="Logic" colour="#fdcb6e">
+            <block type="if_condition"></block>
+            <block type="if_else_condition"></block>
+            <block type="while_loop"></block>
+            <block type="for_loop"></block>
+        </category>
+
+        <category name="Operators" colour="#fdcb6e">
+            <block type="compare_equal"></block>
+            <block type="compare_less"></block>
+            <block type="compare_greater"></block>
+            <block type="logic_and"></block>
+            <block type="logic_or"></block>
+            <block type="logic_not"></block>
+        </category>
+
+        <category name="Math" colour="#95a5a6">
+            <block type="math_add"></block>
+            <block type="math_subtract"></block>
+            <block type="math_multiply"></block>
+            <block type="math_divide"></block>
+            <block type="random_number"></block>
+            <block type="number_value"></block>
+        </category>
+
+        <category name="Text" colour="#a29bfe">
+            <block type="text_value"></block>
+            <block type="text_join"></block>
+            <block type="get_my_id"></block>
+        </category>
+
+        <category name="Variables" colour="#9b59b6" custom="VARIABLE"></category>
+        <category name="Functions" colour="#e74c3c" custom="PROCEDURE"></category>
+    </xml>
+
+    <!-- 新增專案模態框 -->
+    <div id="projectModal" class="modal">
+        <div class="modal-content" style="max-width: 450px;">
+            <div class="modal-header">➕ 新增專案</div>
+            <div class="modal-body">
+                <div style="margin-bottom: 15px;">
+                    <label style="display: block; margin-bottom: 5px; color: #00ff00;">專案名稱 *</label>
+                    <input type="text" id="projectName" placeholder="輸入專案名稱"
+                        style="width: 100%; padding: 8px; background: #222; border: 1px solid #00ff00; color: #00ff00;">
+                </div>
+                <div style="margin-bottom: 15px;">
+                    <label style="display: block; margin-bottom: 5px; color: #00ff00;">專案類型 *</label>
+                    <select id="projectType"
+                        style="width: 100%; padding: 8px; background: #222; border: 1px solid #00ff00; color: #00ff00;">
+                        <option value="world">🌍 World Code (世界代碼 - 支援事件)</option>
+                        <option value="block">🧩 Code Block (代碼塊 - 不支援事件)</option>
+                    </select>
+                </div>
+                <div style="margin-bottom: 15px;">
+                    <label style="display: block; margin-bottom: 5px; color: #00ff00;">描述 (選填)</label>
+                    <textarea id="projectDesc" placeholder="輸入專案描述..."
+                        style="width: 100%; padding: 8px; height: 80px; background: #222; border: 1px solid #00ff00; color: #00ff00; resize: vertical;"></textarea>
+                </div>
+                <div
+                    style="padding: 10px; background: #1a1a1a; border: 1px solid #00ff00; color: #00ff00; font-size: 12px; border-radius: 3px;">
+                    <strong>說明：</strong><br>
+                    • World Code: 支援所有事件(事件回調)，使用 playerId<br>
+                    • Code Block: 不支援事件，使用 myId 和 thisPos
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-primary" onclick="createProject()"
+                    style="background: #00ff00; color: #000;">建立</button>
+                <button class="btn-primary" onclick="closeProjectModal()">取消</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 範例模態框 -->
+    <div id="examplesModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">📚 Code Examples</div>
+            <div class="modal-body" style="color: #00ff00; font-size: 12px; max-height: 300px; overflow-y: auto;">
+                <p><strong>Welcome Message</strong></p>
+                <p>1. Drag "Player Join" block<br />2. Add "Broadcast" inside<br />3. Type your message</p>
+                <hr style="border-color: #00ff00; margin: 10px 0;">
+                <p><strong>Damage System</strong></p>
+                <p>1. Use "on_player_chat" event<br />2. Add "Set Health" block<br />3. Connect to logic</p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-primary" onclick="closeModal('examplesModal')">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 幫助模態框 -->
+    <div id="helpModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">❓ Help & Documentation</div>
+            <div class="modal-body" style="color: #00ff00; font-size: 12px; max-height: 300px; overflow-y: auto;">
+                <p><strong>Getting Started</strong></p>
+                <p>• Drag blocks from the left panel<br />• Connect them to create logic<br />• Click START to run your
+                    code</p>
+                <p style="margin-top: 10px;"><strong>Common Blocks</strong></p>
+                <p>• <strong>Player Join:</strong> Triggers when player joins<br />
+                    • <strong>Set Pos:</strong> Move player to position<br />
+                    • <strong>Set Health:</strong> Modify player health<br />
+                    • <strong>Broadcast:</strong> Send message to all players</p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-primary" onclick="closeModal('helpModal')">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/blockly-blocks-neon.js"></script>
+    <script src="js/toolbox.js"></script>
+    <script src="js/project-manager.js"></script>
+    <script>
+        // Initialize generator registry AFTER blocks are loaded
+        // This handles the case where Blockly.JavaScript.forBlock needs to be created
+        if (typeof Blockly !== 'undefined' && Blockly.JavaScript) {
+            if (!Blockly.JavaScript.forBlock) {
+                Blockly.JavaScript.forBlock = {};
+            }
+            console.log('✅ Generator registry initialized');
+        }
+    </script>
+    <script>
+        let workspace = null;
+        let currentProjectType = 'world'; // 追蹤當前專案類型
+
+        // Wait for Blockly to fully load
+        function checkAndInitialize() {
+            if (typeof Blockly === 'undefined' || !Blockly.inject) {
+                setTimeout(checkAndInitialize, 100);
+                return;
+            }
+
+            // Additional check: verify generators are loaded
+            console.log('🔍 Blockly loaded, checking generators...');
+            console.log('Blockly.JavaScript type:', typeof Blockly.JavaScript);
+            console.log('on_player_join in Blockly.JavaScript:', !!Blockly.JavaScript['on_player_join']);
+            console.log('forBlock exists:', !!Blockly.JavaScript.forBlock);
+            if (Blockly.JavaScript.forBlock) {
+                console.log('on_player_join in forBlock:', !!Blockly.JavaScript.forBlock['on_player_join']);
+            }
+
+            initializeBlockly();
+        }
+
+        // 初始化 Blockly
+        function initializeBlockly() {
+            try {
+                const toolboxElement = document.getElementById('toolbox');
+
+                if (!toolboxElement) {
+                    console.error('❌ Toolbox element not found');
+                    return;
+                }
+
+                console.log('📦 Toolbox found, categories:', toolboxElement.querySelectorAll('category').length);
+
+                // 轉換 XML 為 Blockly 工具箱結構
+                const toolboxDefinition = Blockly.utils.xml.textToDom(toolboxElement.outerHTML);
+
+                workspace = Blockly.inject('blocklyDiv', {
+                    toolbox: toolboxDefinition,
+                    grid: {
+                        spacing: 20,
+                        length: 3,
+                        colour: '#444',
+                        snap: true
+                    },
+                    zoom: {
+                        controls: true,
+                        wheel: true,
+                        startScale: 1.0,
+                        maxScale: 3,
+                        minScale: 0.3
+                    },
+                    theme: Blockly.Themes.Dark,
+                    move: {
+                        scrollbars: true,
+                        drag: true,
+                        wheel: true
+                    }
+                });
+
+                workspace.addChangeListener(generateCode);
+                console.log('✅ Blockly initialized successfully');
+
+                // 添加小延遲以確保代碼生成器已準備好
+                setTimeout(generateCode, 100);
+            } catch (e) {
+                console.error('❌ Failed to initialize Blockly:', e);
+                console.error('Stack:', e.stack);
+                setTimeout(initializeBlockly, 500);
+            }
+        }
+
+        // 生成代碼
+        function generateCode() {
+            if (!workspace) return;
+
+            // 確保 Blockly.JavaScript 存在
+            if (!Blockly.JavaScript || typeof Blockly.JavaScript.workspaceToCode !== 'function') {
+                document.getElementById('output').textContent = '// 等待 Blockly 初始化...';
+                setTimeout(generateCode, 100);
+                return;
+            }
+
+            try {
+                // Debug: Check if generators are available
+                if (console && console.log) {
+                    if (!Blockly.JavaScript['on_player_join'] && (!Blockly.JavaScript.forBlock || !Blockly.JavaScript.forBlock['on_player_join'])) {
+                        console.warn('⚠️ on_player_join generator not found when generating code');
+                    }
+                }
+
+                let code = Blockly.JavaScript.workspaceToCode(workspace);
+
+                // 根據專案類型進行代碼轉換
+                if (currentProjectType === 'world') {
+                    code = transformCodeForWorldCode(code);
+                }
+
+                document.getElementById('output').textContent = code || '// 空工作區 - 從左側拖入積木開始編程';
+            } catch (e) {
+                document.getElementById('output').textContent = `// 錯誤: ${e.message}\n\n// 堆疊追蹤:\n${e.stack}`;
+                console.error('Code generation error:', e);
+                console.error('Stack:', e.stack);
+                // Debug: List available generators
+                if (Blockly.JavaScript && console && console.log) {
+                    console.log('Available generators (first 10):', Object.keys(Blockly.JavaScript).slice(0, 10));
+                }
+            }
+        }
+
+        // 為 World Code 轉換代碼 - 將所有 ID 參數轉換為 playerId
+        function transformCodeForWorldCode(code) {
+            // 將 api.* 函數的 myId 參數替換為 playerId
+            // 例如: api.setHealth(myId, ...) -> api.setHealth(playerId, ...)
+
+            let transformedCode = code;
+
+            // 替換 API 調用中的 myId -> playerId
+            // 匹配 api.函數名(myId 的模式
+            transformedCode = transformedCode.replace(/api\.(\w+)\(\s*myId/g, 'api.$1(playerId');
+
+            // 替換括號內的 myId -> playerId（用於多參數的情況）
+            // 例如: api.setHealth(myId, 20) -> api.setHealth(playerId, 20)
+            transformedCode = transformedCode.replace(/,\s*myId/g, ', playerId');
+
+            // 替換其他 myId 使用（但不是在變數聲明或事件回調參數中）
+            // 只替換 api 調用或函數調用中的 myId
+
+            return transformedCode;
+        }
+
+        // 複製代碼
+        function copyCode() {
+            const code = document.getElementById('output').textContent;
+            navigator.clipboard.writeText(code).then(() => {
+                alert('✓ Code copied to clipboard!');
+            }).catch(() => {
+                alert('✗ Failed to copy. Please copy manually.');
+            });
+        }
+
+        // 下載代碼
+        function downloadCode() {
+            const code = document.getElementById('output').textContent;
+            const filename = `bloxd-code-${Date.now()}.js`;
+
+            const element = document.createElement('a');
+            element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(code));
+            element.setAttribute('download', filename);
+            element.style.display = 'none';
+            document.body.appendChild(element);
+            element.click();
+            document.body.removeChild(element);
+            alert(`✓ File downloaded: ${filename}`);
+        }
+
+        // 重置工作區
+        function resetWorkspace() {
+            if (confirm('Are you sure you want to clear all blocks?')) {
+                workspace.clear();
+                generateCode();
+            }
+        }
+
+        // 運行代碼
+        function runCode() {
+            const code = document.getElementById('output').textContent;
+            try {
+                eval(code);
+                alert('✓ Code executed successfully!');
+            } catch (e) {
+                alert(`✗ Runtime Error: ${e.message}`);
+            }
+        }
+
+        // ============ 專案管理函數 ============
+        function showProjectModal() {
+            document.getElementById('projectModal').classList.add('show');
+        }
+
+        function closeProjectModal() {
+            document.getElementById('projectModal').classList.remove('show');
+            document.getElementById('projectName').value = '';
+            document.getElementById('projectType').value = 'world';
+            document.getElementById('projectDesc').value = '';
+        }
+
+        function createProject() {
+            const name = document.getElementById('projectName').value.trim();
+            const type = document.getElementById('projectType').value;
+            const description = document.getElementById('projectDesc').value.trim();
+
+            if (!name) {
+                alert('❌ 請輸入專案名稱');
+                return;
+            }
+
+            projectManager.createProject(name, type, description);
+            currentProjectType = type; // 設定當前專案類型
+            closeProjectModal();
+            updateProjectList();
+            selectProject(projectManager.currentProject.id);
+
+            // 重置工作區並設置適當的模式
+            workspace.clear();
+
+            // 只有世界代碼才能訪問事件
+            updateToolbox(type);
+
+            alert(`✅ 專案 "${name}" 已建立！`);
+        }
+
+        function updateProjectList() {
+            const select = document.getElementById('projectSelect');
+            select.innerHTML = '<option value="">-- 選擇專案 --</option>';
+
+            projectManager.getAllProjects().forEach(project => {
+                const option = document.createElement('option');
+                option.value = project.id;
+                option.textContent = `${project.name} (${project.type === 'world' ? '🌍 World' : '🧩 Block'})`;
+                select.appendChild(option);
+            });
+        }
+
+        function selectProject(projectId) {
+            const select = document.getElementById('projectSelect');
+            select.value = projectId;
+            loadProject();
+        }
+
+        function loadProject() {
+            const projectId = document.getElementById('projectSelect').value;
+            if (!projectId) {
+                workspace.clear();
+                projectManager.currentProject = null;
+                currentProjectType = 'world'; // 重置為默認
+                return;
+            }
+
+            const project = projectManager.getProject(projectId);
+            if (project) {
+                projectManager.currentProject = project;
+                currentProjectType = project.type; // 更新當前專案類型
+
+                // 只有世界代碼才能訪問事件
+                updateToolbox(project.type);
+
+                // 恢復工作區
+                if (project.workspace) {
+                    workspace.clear();
+                    try {
+                        Blockly.serialization.workspaces.load(project.workspace, workspace);
+                    } catch (e) {
+                        console.error('Error loading workspace:', e);
+                    }
+                }
+
+                generateCode();
+            }
+        }
+
+        function saveCurrentProject() {
+            if (!projectManager.currentProject) {
+                alert('❌ 請先建立或選擇一個專案');
+                return;
+            }
+
+            const code = document.getElementById('output').textContent;
+            const workspace_data = Blockly.serialization.workspaces.save(workspace);
+
+            projectManager.updateProject(projectManager.currentProject.id, {
+                code,
+                workspace: workspace_data
+            });
+
+            alert(`✅ 專案 "${projectManager.currentProject.name}" 已保存！`);
+        }
+
+        function exportProject() {
+            if (!projectManager.currentProject) {
+                alert('❌ 請先選擇或建立一個專案');
+                return;
+            }
+
+            saveCurrentProject();
+            const project = projectManager.currentProject;
+
+            if (project.type === 'world') {
+                exportWorldCodeTemplate();
+            } else {
+                exportCodeBlock();
+            }
+        }
+
+        function exportWorldCodeTemplate() {
+            const template = `// ===== 世界代碼模板 =====
+// 支援所有事件回調和 playerId
+
+try { db } catch { db = {} }
+if (!db.data) db.data = {};
+
+// 定義您的世界代碼邏輯
+
+/* ===== 事件處理 ===== */
+
+function onPlayerJoin(playerId, fromGameReset) {
+    // 玩家加入事件
+}
+
+function onPlayerLeave(playerId, serverIsShuttingDown) {
+    // 玩家離開事件
+}
+
+function onPlayerChat(playerId, message) {
+    // 玩家聊天事件
+    return true;
+}
+
+tick = (ms) => {
+    // 定期執行
+};
+`;
+
+            const code = document.getElementById('output').textContent;
+            const fullCode = template + '\n\n// ===== 您的自定義代碼 =====\n' + code;
+
+            downloadToFile(fullCode, `${projectManager.currentProject.name}-world.js`);
+        }
+
+        function exportCodeBlock() {
+            const template = `// ===== 代碼塊模板 =====
+// 使用 myId 和 thisPos 變數
+// 不支援事件回調
+
+// 在這裡編寫您的代碼塊邏輯
+// myId: 當前實體 ID
+// thisPos: 當前位置 [x, y, z]
+`;
+
+            const code = document.getElementById('output').textContent;
+            const fullCode = template + '\n' + code;
+
+            downloadToFile(fullCode, `${projectManager.currentProject.name}-block.js`);
+        }
+
+        // 保存專案
+        function saveProject() {
+            saveCurrentProject();
+        }
+
+        // 加載專案文件
+        function loadProjectFile() {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = '.bloxd,.json';
+            input.onchange = (e) => {
+                const file = e.target.files[0];
+                if (!file) return;
+
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    try {
+                        const project = JSON.parse(event.target.result);
+                        // 使用新系統
+                        if (project.workspace) {
+                            workspace.clear();
+                            Blockly.serialization.workspaces.load(project.workspace, workspace);
+                        } else if (project.xml) {
+                            // 舊格式支援
+                            const xml = Blockly.Xml.textToDom(project.xml);
+                            workspace.clear();
+                            Blockly.Xml.domToWorkspace(xml, workspace);
+                        }
+                        generateCode();
+                        alert(`✓ 專案已加載: ${project.name}`);
+                    } catch (err) {
+                        alert(`✗ 加載失敗: ${err.message}`);
+                    }
+                };
+                reader.readAsText(file);
+            };
+            input.click();
+        }
+
+        // 顯示 Examples
+        function showExamples() {
+            document.getElementById('examplesModal').classList.add('show');
+        }
+
+        // 顯示 Help
+        function showHelp() {
+            document.getElementById('helpModal').classList.add('show');
+        }
+
+        // 關閉模態框
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('show');
+        }
+
+        // 窗口點擊事件 - 關閉模態框
+        window.addEventListener('click', (event) => {
+            const projectModal = document.getElementById('projectModal');
+            if (event.target === projectModal) {
+                closeProjectModal();
+            }
+        });
+
+        // 初始化 - 等待 Blockly 庫完全加載
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', () => {
+                checkAndInitialize();
+                // 初始化專案列表
+                if (typeof updateProjectList === 'function') {
+                    updateProjectList();
+                }
+            });
+        } else {
+            checkAndInitialize();
+            if (typeof updateProjectList === 'function') {
+                updateProjectList();
+            }
+        }
+    </script>
+
+</body>
+
+</html>
